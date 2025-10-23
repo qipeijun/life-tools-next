@@ -1,0 +1,3 @@
+module.exports=[91763,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(87103);a.n(d("[project]/code/githubProject/life-tools-next/node_modules/next/dist/client/components/builtin/global-error.js <module evaluation>"))},42133,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(87103);a.n(d("[project]/code/githubProject/life-tools-next/node_modules/next/dist/client/components/builtin/global-error.js"))},26977,a=>{"use strict";a.i(91763);var b=a.i(42133);a.n(b)}];
+
+//# sourceMappingURL=1e8a5_next_dist_client_components_builtin_global-error_12ffaf27.js.map

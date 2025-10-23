@@ -1,0 +1,5 @@
+{
+  "/page": "app/page.js",
+  "/soy-milk/page": "app/soy-milk/page.js",
+  "/t-day-calculator/page": "app/t-day-calculator/page.js"
+}

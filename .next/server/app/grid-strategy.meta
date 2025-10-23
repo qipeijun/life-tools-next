@@ -1,0 +1,14 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/grid-strategy/layout,_N_T_/grid-strategy/page,_N_T_/grid-strategy"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/grid-strategy/__PAGE__",
+    "/grid-strategy",
+    "/_index"
+  ]
+}
