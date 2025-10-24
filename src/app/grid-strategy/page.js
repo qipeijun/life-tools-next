@@ -251,15 +251,15 @@ export default function GridStrategyPage() {
         <main className="max-w-4xl mx-auto space-y-8">
           {/* 工具介绍 */}
           <section className="text-center animate-fade-in">
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto" mobile={isMobile}>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
               基于RSI的智能网格区间计算和收益分析，助您优化量化交易策略
             </p>
           </section>
 
           {/* 快速配置 */}
           <section className="animate-slide-up" style={{ animationDelay: '200ms' }}>
-            <Card hover className="bg-card/80 backdrop-blur-sm" mobile={isMobile}>
-              <CardHeader mobile={isMobile}>
+            <Card hover className="bg-card/80 backdrop-blur-sm">
+              <CardHeader>
                 <div className="flex items-center">
                   <div className="w-14 h-14 bg-purple-10/50 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-4">
                     <Zap className="w-7 h-7 text-purple-600" />
@@ -271,7 +271,7 @@ export default function GridStrategyPage() {
                 </div>
               </CardHeader>
 
-              <CardBody mobile={isMobile}>
+              <CardBody>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {presetConfigs.map((preset, index) => (
                     <Button
@@ -279,8 +279,7 @@ export default function GridStrategyPage() {
                       variant="outline"
                       onClick={() => applyPreset(preset)}
                       className="p-6 h-auto flex flex-col items-center space-y-3 rounded-2xl"
-                      mobile={isMobile}
-                    >
+                                         >
                       <div className="w-10 h-10 bg-purple-100/50 backdrop-blur-sm rounded-xl flex items-center justify-center">
                         <Settings className="w-5 h-5 text-purple-600" />
                       </div>
@@ -299,8 +298,8 @@ export default function GridStrategyPage() {
 
           {/* 参数设置 */}
           <section className="animate-slide-up" style={{ animationDelay: '300ms' }}>
-            <Card hover className="bg-card/80 backdrop-blur-sm" mobile={isMobile}>
-              <CardHeader mobile={isMobile}>
+            <Card hover className="bg-card/80 backdrop-blur-sm">
+              <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="w-14 h-14 bg-purple-10/50 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-4">
@@ -313,18 +312,16 @@ export default function GridStrategyPage() {
                   </div>
                   <Button
                     variant="outline"
-                    size="sm"
                     onClick={() => setShowAdvanced(!showAdvanced)}
                     className="rounded-xl"
-                    mobile={isMobile}
-                  >
+                                     >
                     <Settings className="w-4 h-4 mr-2" />
                     {showAdvanced ? '简化' : '高级'}
                   </Button>
                 </div>
               </CardHeader>
 
-              <CardBody className="space-y-6" mobile={isMobile}>
+              <CardBody className="space-y-6">
                 {/* 基础价格参数 */}
                 <div>
                   <h4 className="font-semibold mb-4 flex items-center">
@@ -344,8 +341,7 @@ export default function GridStrategyPage() {
                       icon={<TrendingUp className="w-4 h-4" />}
                       step="0.01"
                       required
-                      mobile={isMobile}
-                    />
+                                         />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <Input
@@ -358,8 +354,7 @@ export default function GridStrategyPage() {
                         icon={<TrendingUp className="w-4 h-4" />}
                         step="0.01"
                         required
-                        mobile={isMobile}
-                      />
+                                             />
                       <Input
                         label="下限价格"
                         type="number"
@@ -370,8 +365,7 @@ export default function GridStrategyPage() {
                         icon={<TrendingDown className="w-4 h-4" />}
                         step="0.01"
                         required
-                        mobile={isMobile}
-                      />
+                                             />
                     </div>
                   </div>
                 </div>
@@ -396,8 +390,7 @@ export default function GridStrategyPage() {
                         error={errors.rsi}
                         icon={<BarChart3 className="w-4 h-4" />}
                         step="0.01"
-                        mobile={isMobile}
-                      />
+                                             />
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Input
@@ -411,8 +404,7 @@ export default function GridStrategyPage() {
                           step="1"
                           min="2"
                           max="50"
-                          mobile={isMobile}
-                        />
+                                                 />
                         <Input
                           label="投资金额 (USDT)"
                           type="number"
@@ -423,8 +415,7 @@ export default function GridStrategyPage() {
                           icon={<Calculator className="w-4 h-4" />}
                           step="100"
                           min="100"
-                          mobile={isMobile}
-                        />
+                                                 />
                       </div>
                     </div>
                   </div>
@@ -436,18 +427,14 @@ export default function GridStrategyPage() {
                     disabled={isLoading || !currentPrice || !upperPrice || !lowerPrice}
                     loading={isLoading}
                     className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
-                    size="lg"
-                    mobile={isMobile}
-                  >
+                                     >
                     {isLoading ? '计算中...' : '生成网格策略'}
                   </Button>
                   <Button
                     variant="outline"
                     onClick={handleClear}
                     disabled={isLoading}
-                    size="lg"
-                    mobile={isMobile}
-                  >
+                                     >
                     清除结果
                   </Button>
                 </div>
@@ -459,8 +446,8 @@ export default function GridStrategyPage() {
           {result && !result.error && (
             <>
               <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
-                <Card hover mobile={isMobile}>
-                  <CardHeader mobile={isMobile}>
+                <Card hover>
+                  <CardHeader>
                     <div className="text-center">
                       <div className="inline-flex items-center px-4 py-2 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 mb-4">
                         <Grid3X3 className="w-5 h-5 mr-2" />
@@ -469,7 +456,7 @@ export default function GridStrategyPage() {
                     </div>
                   </CardHeader>
 
-                  <CardBody className="space-y-6" mobile={isMobile}>
+                  <CardBody className="space-y-6">
                     {/* 智能区间优化 */}
                     <div className="bg-muted/50 rounded-xl p-6">
                       <h4 className="font-semibold mb-4 flex items-center">
@@ -543,10 +530,8 @@ export default function GridStrategyPage() {
                         <h4 className="font-semibold">收益分析</h4>
                         <Button
                           variant="outline"
-                          size="sm"
-                          onClick={() => setShowProfit(!showProfit)}
-                          mobile={isMobile}
-                        >
+                                onClick={() => setShowProfit(!showProfit)}
+                                                 >
                           <Calculator className="w-4 h-4 mr-2" />
                           {showProfit ? '简化' : '详细'}
                         </Button>
@@ -606,8 +591,8 @@ export default function GridStrategyPage() {
 
               {/* 风险提示 */}
               <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
-                <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800" mobile={isMobile}>
-                  <CardHeader mobile={isMobile}>
+                <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+                  <CardHeader>
                     <div className="flex items-start">
                       <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
                         <Info className="w-4 h-4 text-blue-600" />
@@ -627,7 +612,7 @@ export default function GridStrategyPage() {
                     </div>
                   </CardHeader>
 
-                  <CardBody mobile={isMobile}>
+                  <CardBody>
                   </CardBody>
                 </Card>
               </section>
@@ -637,8 +622,8 @@ export default function GridStrategyPage() {
           {/* 错误提示 */}
           {result && result.error && (
             <section className="animate-fade-in">
-              <Card className="border-error bg-error/10" mobile={isMobile}>
-                <CardBody mobile={isMobile}>
+              <Card className="border-error bg-error/10">
+                <CardBody>
                   <div className="flex items-center text-error">
                     <AlertCircle className="w-5 h-5 mr-3" />
                     <div>
@@ -653,8 +638,8 @@ export default function GridStrategyPage() {
 
           {/* 使用说明 */}
           <section className="animate-fade-in" style={{ animationDelay: '600ms' }}>
-            <Card className="bg-muted/30" mobile={isMobile}>
-              <CardHeader mobile={isMobile}>
+            <Card className="bg-muted/30">
+              <CardHeader>
                 <h3 className="h4 mb-2 flex items-center">
                   <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
                     <Info className="w-4 h-4 text-primary" />
@@ -664,7 +649,7 @@ export default function GridStrategyPage() {
                 <p className="text-muted-foreground">了解网格策略的核心概念和使用方法</p>
               </CardHeader>
 
-              <CardBody className="space-y-6" mobile={isMobile}>
+              <CardBody className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-3">
                     <h4 className="font-semibold text-primary">参数说明</h4>

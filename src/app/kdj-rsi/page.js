@@ -151,57 +151,62 @@ export default function KDJRSIPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      <div className="container mx-auto px-4 py-8">
-        {/* 背景装饰 */}
+      {/* 移动端优化的容器 */}
+      <div className="container mx-auto px-mobile-gutter py-mobile-section sm:px-6 sm:py-8">
+        {/* 背景装饰 - 移动端优化 */}
         <div className="fixed inset-0 -z-10 overflow-hidden">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/2 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-success/5 rounded-full blur-3xl"></div>
+          <div className="absolute top-0 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-primary/5 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-accent/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-1/3 w-64 h-64 sm:w-96 sm:h-96 bg-success/5 rounded-full blur-3xl"></div>
         </div>
 
-        {/* 头部导航 */}
-        <header className="flex items-center justify-between mb-8 animate-slide-up">
+        {/* 移动端头部导航 */}
+        <header className="flex items-center justify-between mb-6 sm:mb-8 animate-mobile-slide-up">
           <Link
             href="/"
-            className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors"
+            className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors px-2 py-2 -mx-2 active:scale-95"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            返回首页
+            <ArrowLeft className="w-5 h-5 sm:w-4 sm:h-4 mr-2" />
+            <span className="text-base sm:text-sm">返回</span>
           </Link>
 
           <div className="flex items-center space-x-2">
-            <TrendingUp className="w-6 h-6 text-primary animate-pulse" />
-            <h1 className="h2">KDJ + RSI 分析</h1>
+            <TrendingUp className="w-6 h-6 sm:w-5 sm:h-5 text-primary animate-pulse" />
+            <h1 className="text-xl sm:text-lg font-bold text-gray-900 dark:text-white">KDJ分析</h1>
           </div>
 
-          <ThemeToggle />
+          <div className="p-2">
+            <ThemeToggle />
+          </div>
         </header>
 
-        <main className="max-w-2xl mx-auto space-y-8">
-          {/* 工具介绍 */}
-          <section className="text-center animate-fade-in">
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              基于KDJ和RSI指标的专业分析工具，助您把握市场脉搏
-            </p>
+        <main className="max-w-2xl mx-auto space-y-6 sm:space-y-8">
+          {/* 工具介绍 - 移动端优化 */}
+          <section className="text-center animate-mobile-fade-in">
+            <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-mobile-card">
+              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
+                基于KDJ和RSI指标的专业分析工具，助您把握市场脉搏
+              </p>
+            </div>
           </section>
 
-          {/* 输入表单 */}
-          <section className="animate-slide-up" style={{ animationDelay: '200ms' }}>
-            <Card hover mobile={isMobile}>
-              <CardHeader mobile={isMobile}>
+          {/* 输入表单 - 移动端优化 */}
+          <section className="animate-mobile-slide-up" style={{ animationDelay: '200ms' }}>
+            <Card hover variant="elevated" className="shadow-mobile-elevated">
+              <CardHeader>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mr-4">
-                    <TrendingUp className="w-6 h-6 text-primary" />
+                  <div className="w-12 h-12 sm:w-10 sm:h-10 bg-primary/10 rounded-xl flex items-center justify-center mr-3 sm:mr-4">
+                    <TrendingUp className="w-6 h-6 sm:w-5 sm:h-5 text-primary" />
                   </div>
-                  <div>
-                    <h2 className="h3 mb-1">参数输入</h2>
-                    <p className="text-muted-foreground">填写技术指标参数进行智能分析</p>
+                  <div className="flex-1">
+                    <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-1">参数输入</h2>
+                    <p className="text-sm text-muted-foreground">填写技术指标参数进行智能分析</p>
                   </div>
                 </div>
               </CardHeader>
 
-              <CardBody className="space-y-6" mobile={isMobile}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <CardBody className="space-y-4 sm:space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <Input
                     label="KDJ - J值"
                     type="number"
@@ -212,7 +217,6 @@ export default function KDJRSIPage() {
                     icon={<TrendingUp className="w-4 h-4" />}
                     step="0.01"
                     required
-                    mobile={isMobile}
                   />
 
                   <Input
@@ -225,7 +229,6 @@ export default function KDJRSIPage() {
                     icon={<BarChart3 className="w-4 h-4" />}
                     step="0.01"
                     required
-                    mobile={isMobile}
                   />
                 </div>
 
@@ -238,17 +241,16 @@ export default function KDJRSIPage() {
                   error={errors.volume}
                   icon={<TrendingUp className="w-4 h-4" />}
                   step="1"
-                  mobile={isMobile}
                 />
 
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
+                  <label className="block text-base sm:text-sm font-medium text-foreground mb-3 sm:mb-2">
                     分析周期
                   </label>
                   <select
                     value={cycle}
                     onChange={(e) => setCycle(e.target.value)}
-                    className="input"
+                    className="h-14 sm:h-10 px-4 text-base sm:text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent touch-manipulation"
                   >
                     <option value="day">日线</option>
                     <option value="week">周线</option>
@@ -257,25 +259,26 @@ export default function KDJRSIPage() {
                   </select>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2">
                   <Button
                     onClick={handleAnalyze}
                     disabled={isLoading || !jValue || !rsiValue}
                     loading={isLoading}
-                    className="flex-1"
-                    size="lg"
-                    mobile={isMobile}
+                    className="flex-1 h-touch-comfortable sm:h-auto"
+                    fullWidth
                   >
-                    {isLoading ? '分析中...' : '开始分析'}
+                    <span className="text-base sm:text-sm font-medium">
+                      {isLoading ? '分析中...' : '开始分析'}
+                    </span>
                   </Button>
                   <Button
                     variant="outline"
                     onClick={handleClear}
                     disabled={isLoading}
-                    size="lg"
-                    mobile={isMobile}
+                    className="h-touch-comfortable sm:h-auto"
+                    fullWidth
                   >
-                    清除结果
+                    <span className="text-base sm:text-sm font-medium">清除结果</span>
                   </Button>
                 </div>
               </CardBody>
@@ -298,7 +301,7 @@ export default function KDJRSIPage() {
                   </div>
                 </CardHeader>
 
-                <CardBody className="space-y-6" mobile={isMobile}>
+                <CardBody className="space-y-6">
                   <div className="bg-muted/50 rounded-xl p-6">
                     <div className="flex items-start">
                       <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
@@ -314,7 +317,7 @@ export default function KDJRSIPage() {
                   </div>
 
                   {result.signal === 'error' && (
-                    <div className="flex items-center text-error bg-error/10 rounded-xl p-4" mobile={isMobile}>
+                    <div className="flex items-center text-error bg-error/10 rounded-xl p-4">
                       <AlertCircle className="w-5 h-5 mr-3" />
                       <span className="text-sm">分析出现错误，请检查输入参数</span>
                     </div>
@@ -326,13 +329,13 @@ export default function KDJRSIPage() {
 
           {/* 使用说明 */}
           <section className="animate-fade-in" style={{ animationDelay: '600ms' }}>
-            <Card className="bg-muted/30" mobile={isMobile}>
-              <CardHeader mobile={isMobile}>
+            <Card className="bg-muted/30">
+              <CardHeader>
                 <h3 className="h4 mb-2">使用说明</h3>
                 <p className="text-muted-foreground">了解指标含义和使用技巧</p>
               </CardHeader>
 
-              <CardBody mobile={isMobile}>
+              <CardBody>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-3">
                     <h4 className="font-semibold text-primary">指标说明</h4>

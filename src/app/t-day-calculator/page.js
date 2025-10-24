@@ -168,33 +168,36 @@ export default function TDayCalculatorPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      <div className="container mx-auto px-4 py-8">
-        {/* 背景装饰 */}
+      {/* 移动端优化的容器 */}
+      <div className="container mx-auto px-mobile-gutter py-mobile-section sm:px-6 sm:py-8">
+        {/* 背景装饰 - 移动端优化 */}
         <div className="fixed inset-0 -z-10 overflow-hidden">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-500/5 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/2 right-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl"></div>
+          <div className="absolute top-0 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-green-500/5 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-emerald-500/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-1/3 w-64 h-64 sm:w-96 sm:h-96 bg-teal-500/5 rounded-full blur-3xl"></div>
         </div>
 
-        {/* 头部导航 */}
-        <header className="flex items-center justify-between mb-8 animate-slide-up">
+        {/* 移动端头部导航 */}
+        <header className="flex items-center justify-between mb-6 sm:mb-8 animate-mobile-slide-up">
           <Link
             href="/"
-            className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors"
+            className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors px-2 py-2 -mx-2 active:scale-95"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            返回首页
+            <ArrowLeft className="w-5 h-5 sm:w-4 sm:h-4 mr-2" />
+            <span className="text-base sm:text-sm">返回</span>
           </Link>
 
           <div className="flex items-center space-x-2">
-            <Calculator className="w-6 h-6 text-green-600 animate-pulse" />
-            <h1 className="h2">做T计算器</h1>
+            <Calculator className="w-6 h-6 sm:w-5 sm:h-5 text-green-600 animate-pulse" />
+            <h1 className="text-xl sm:text-lg font-bold text-gray-900 dark:text-white">做T计算器</h1>
           </div>
 
-          <ThemeToggle />
+          <div className="p-2">
+            <ThemeToggle />
+          </div>
         </header>
 
-        <main className="max-w-4xl mx-auto space-y-8">
+        <main className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
           {/* 工具介绍 */}
           <section className="text-center animate-fade-in">
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
@@ -218,7 +221,6 @@ export default function TDayCalculatorPage() {
                   </div>
                   <Button
                     variant="outline"
-                    size="sm"
                     onClick={() => setShowAdvanced(!showAdvanced)}
                   >
                     <Settings className="w-4 h-4 mr-2" />
@@ -317,8 +319,7 @@ export default function TDayCalculatorPage() {
                             <Button
                               key={index}
                               variant={parseFloat(commission) === preset.value ? 'primary' : 'outline'}
-                              size="sm"
-                              onClick={() => setCommission(preset.value.toString())}
+                                        onClick={() => setCommission(preset.value.toString())}
                               className="p-3 h-auto flex flex-col items-center space-y-1"
                             >
                               <div className="font-semibold">{preset.label}</div>
@@ -361,7 +362,6 @@ export default function TDayCalculatorPage() {
                     onClick={handleCalculate}
                     disabled={!buyPrice || !sellPrice || !quantity}
                     className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
-                    size="lg"
                   >
                     <Calculator className="w-4 h-4 mr-2" />
                     计算收益
@@ -369,7 +369,6 @@ export default function TDayCalculatorPage() {
                   <Button
                     variant="outline"
                     onClick={handleClear}
-                    size="lg"
                   >
                     清除结果
                   </Button>

@@ -2,117 +2,145 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 重置和基础样式 */
-* {
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
- font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", system-ui, sans-serif;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow-x: hidden;
-}
-
-/* 页面加载动画 */
-body.loading {
-  opacity: 0;
-}
-
-/* 滚动条样式 */
-::-webkit-scrollbar {
-  width: 8px;
- height: 8px;
-}
-
-::-webkit-scrollbar-track {
- background: #f1f5f9;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #94a3b8;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
-}
-
-/* 现代化组件样式 */
-@layer components {
-  /* 容器 */
-  .container {
-    @apply w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+/* 基础重置和优化 */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
   }
 
-  /* 卡片样式 - 苹果风格 */
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100;
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* 优化滚动条样式 */
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-gray-800;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400 dark:bg-gray-500;
+  }
+
+  /* 优化选择文本样式 */
+  ::selection {
+    @apply bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-100;
+  }
+
+  /* 优化焦点样式 */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-white dark:ring-offset-gray-900;
+  }
+
+  /* 移动端优化 */
+  @media (max-width: 640px) {
+    html {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: none;
+    }
+
+    body {
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    /* 允许文本选择 */
+    input, textarea, [contenteditable] {
+      -webkit-user-select: auto;
+      user-select: auto;
+    }
+  }
+
+  /* 防止iOS缩放 */
+  @media screen and (max-width: 768px) {
+    input, textarea, select {
+      font-size: 16px;
+    }
+  }
+}
+
+/* 组件样式 */
+@layer components {
+  /* 容器组件 */
+  .container {
+    @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .container-sm {
+    @apply w-full max-w-2xl mx-auto px-4 sm:px-6;
+  }
+
+  .container-md {
+    @apply w-full max-w-4xl mx-auto px-4 sm:px-6;
+  }
+
+  /* 卡片组件 */
   .card {
-    @apply bg-white/90 dark:bg-gray-900/70 backdrop-blur-xl rounded-3xl border-gray-200/60 dark:border-gray-800/60 shadow-lg shadow-gray-200/20 dark:shadow-gray-900/30 transition-all duration-500;
+    @apply bg-white dark:bg-gray-900;
+    @apply border border-gray-200 dark:border-gray-800;
+    @apply rounded-2xl shadow-soft;
+    @apply transition-all duration-300;
   }
 
   .card-hover {
-    @apply hover:shadow-2xl hover:-translate-y-1 hover:border-gray-300/70 dark:hover:border-gray-700/70;
+    @apply hover:shadow-medium hover:-translate-y-1;
+  }
+
+  .card-interactive {
+    @apply hover:shadow-strong hover:-translate-y-2;
+    @apply active:scale-95;
   }
 
   .card-header {
-    @apply p-6 border-b border-gray-200/50 dark:border-gray-800/50 rounded-t-3xl;
+    @apply px-6 py-4 border-b border-gray-200 dark:border-gray-800;
+    @apply rounded-t-2xl;
   }
 
   .card-body {
-    @apply p-6;
+    @apply px-6 py-4;
   }
 
   .card-footer {
-    @apply p-6 border-t border-gray-200/50 dark:border-gray-800/50 rounded-b-3xl;
+    @apply px-6 py-4 border-t border-gray-200 dark:border-gray-800;
+    @apply rounded-b-2xl;
   }
 
-  /* 按钮样式 */
+  /* 按钮组件 */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95;
-  }
-
-  .btn-primary {
-    @apply bg-indigo-600 text-white hover:bg-indigo-700 focus-visible:ring-indigo-500;
-  }
-
-  .btn-secondary {
-    @apply bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700;
-  }
-
-  .btn-accent {
-    @apply bg-purple-600 text-white hover:bg-purple-700 focus-visible:ring-purple-500;
-  }
-
-  .btn-success {
-    @apply bg-green-600 text-white hover:bg-green-700 focus-visible:ring-green-500;
-  }
-
-  .btn-warning {
-    @apply bg-orange-600 text-white hover:bg-orange-700 focus-visible:ring-orange-500;
-  }
-
-  .btn-error {
-    @apply bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500;
-  }
-
-  .btn-outline {
-    @apply border border-gray-300 bg-transparent hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800;
-  }
-
-  .btn-ghost {
-    @apply hover:bg-gray-100 dark:hover:bg-gray-800;
+    @apply inline-flex items-center justify-center;
+    @apply gap-2 whitespace-nowrap;
+    @apply rounded-xl text-sm font-medium;
+    @apply transition-all duration-200;
+    @apply focus-visible:outline-none focus-visible:ring-2;
+    @apply disabled:pointer-events-none disabled:opacity-50;
+    @apply active:scale-95;
   }
 
   .btn-sm {
-    @apply h-9 px-3 text-xs;
+    @apply h-8 px-3 text-xs;
   }
 
   .btn-md {
@@ -120,31 +148,138 @@ body.loading {
   }
 
   .btn-lg {
-    @apply h-12 px-8 text-base;
+    @apply h-12 px-6 text-base;
   }
 
-  /* 移动端优化按钮 */
-  .btn-mobile {
-    @apply h-14 px-6 py-3 text-base min-h-[56px];
+  .btn-xl {
+    @apply h-14 px-8 text-lg;
   }
 
-  /* 输入框样式 */
+  /* 按钮变体 */
+  .btn-primary {
+    @apply bg-primary-600 text-white;
+    @apply hover:bg-primary-700;
+    @apply focus-visible:ring-primary-500;
+    @apply shadow-sm hover:shadow-md;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-100 text-gray-900;
+    @apply hover:bg-gray-200;
+    @apply dark:bg-gray-800 dark:text-gray-100;
+    @apply dark:hover:bg-gray-700;
+    @apply focus-visible:ring-gray-500;
+  }
+
+  .btn-accent {
+    @apply bg-accent-600 text-white;
+    @apply hover:bg-accent-700;
+    @apply focus-visible:ring-accent-500;
+    @apply shadow-sm hover:shadow-md;
+  }
+
+  .btn-success {
+    @apply bg-success-600 text-white;
+    @apply hover:bg-success-700;
+    @apply focus-visible:ring-success-500;
+    @apply shadow-sm hover:shadow-md;
+  }
+
+  .btn-warning {
+    @apply bg-warning-600 text-white;
+    @apply hover:bg-warning-700;
+    @apply focus-visible:ring-warning-500;
+    @apply shadow-sm hover:shadow-md;
+  }
+
+  .btn-error {
+    @apply bg-error-600 text-white;
+    @apply hover:bg-error-700;
+    @apply focus-visible:ring-error-500;
+    @apply shadow-sm hover:shadow-md;
+  }
+
+  .btn-outline {
+    @apply border border-gray-300 bg-transparent;
+    @apply hover:bg-gray-50 text-gray-700;
+    @apply dark:border-gray-600 dark:hover:bg-gray-800;
+    @apply dark:text-gray-300;
+  }
+
+  .btn-ghost {
+    @apply hover:bg-gray-100 dark:hover:bg-gray-800;
+    @apply text-gray-700 dark:text-gray-300;
+  }
+
+  /* 输入框组件 */
   .input {
-    @apply flex h-10 w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400;
+    @apply flex w-full;
+    @apply rounded-xl border border-gray-300;
+    @apply bg-white px-3 py-2 text-sm;
+    @apply placeholder:text-gray-400;
+    @apply transition-colors duration-200;
+    @apply focus-visible:outline-none focus-visible:ring-2;
+    @apply focus-visible:ring-primary-500 focus-visible:border-primary-500;
+    @apply disabled:cursor-not-allowed disabled:opacity-50;
+    @apply dark:border-gray-600 dark:bg-gray-800;
+    @apply dark:text-gray-100 dark:placeholder:text-gray-500;
+  }
+
+  .input-sm {
+    @apply h-8 px-2 text-xs;
+  }
+
+  .input-md {
+    @apply h-10 px-3 text-sm;
+  }
+
+  .input-lg {
+    @apply h-12 px-4 text-base;
   }
 
   .input-error {
-    @apply border-red-500 focus-visible:ring-red-500;
+    @apply border-error-500 focus-visible:ring-error-500;
   }
 
-  /* 移动端优化输入框 */
-  .input-mobile {
-    @apply h-14 px-4 py-3 text-base min-h-[56px];
+  /* 标签组件 */
+  .badge {
+    @apply inline-flex items-center;
+    @apply rounded-full px-2.5 py-0.5 text-xs font-semibold;
+    @apply transition-colors duration-200;
   }
 
-  /* 工具卡片样式 - 苹果风格 */
+  .badge-primary {
+    @apply bg-primary-100 text-primary-800;
+    @apply dark:bg-primary-900/30 dark:text-primary-300;
+  }
+
+  .badge-secondary {
+    @apply bg-gray-100 text-gray-800;
+    @apply dark:bg-gray-800 dark:text-gray-300;
+  }
+
+  .badge-success {
+    @apply bg-success-100 text-success-800;
+    @apply dark:bg-success-900/30 dark:text-success-300;
+  }
+
+  .badge-warning {
+    @apply bg-warning-100 text-warning-800;
+    @apply dark:bg-warning-900/30 dark:text-warning-300;
+  }
+
+  .badge-error {
+    @apply bg-error-100 text-error-800;
+    @apply dark:bg-error-900/30 dark:text-error-300;
+  }
+
+  /* 工具卡片 */
   .tool-card {
-    @apply relative block overflow-hidden rounded-3xl border border-gray-200/60 dark:border-gray-800/60 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 active:scale-95 backdrop-blur-sm;
+    @apply relative block overflow-hidden;
+    @apply rounded-3xl border-0;
+    @apply transition-all duration-500;
+    @apply hover:shadow-strong hover:-translate-y-2;
+    @apply active:scale-95;
     height: 220px;
   }
 
@@ -153,119 +288,181 @@ body.loading {
   }
 
   .tool-card-overlay {
-    @apply absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent;
+    @apply absolute inset-0;
+    @apply bg-gradient-to-t from-black/60 via-black/10 to-transparent;
   }
 
- .tool-card-content {
-    @apply relative h-full p-6 flex flex-col justify-end text-white;
-  }
-
-  /* 移动端优化工具卡片 */
-  .tool-card-mobile {
-    @apply h-40;
+  .tool-card-content {
+    @apply relative h-full p-6;
+    @apply flex flex-col justify-end text-white;
   }
 
   /* 标题样式 */
   .h1 {
-    @apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
+    @apply text-4xl font-extrabold tracking-tight;
+    @apply lg:text-5xl;
   }
 
   .h2 {
-    @apply scroll-m-20 text-3xl font-semibold tracking-tight;
+    @apply text-3xl font-semibold tracking-tight;
+    @apply lg:text-4xl;
   }
 
   .h3 {
-    @apply scroll-m-20 text-2xl font-semibold tracking-tight;
+    @apply text-2xl font-semibold tracking-tight;
+    @apply lg:text-3xl;
   }
 
   .h4 {
-    @apply scroll-m-20 text-xl font-semibold tracking-tight;
+    @apply text-xl font-semibold tracking-tight;
   }
 
-  /* 移动端标题样式 */
-  .h1-mobile {
-    @apply text-mobile-display font-extrabold tracking-tight;
+  .h5 {
+    @apply text-lg font-medium;
   }
 
-  .h2-mobile {
-    @apply text-mobile-h1 font-semibold tracking-tight;
+  /* 响应式标题 */
+  @media (max-width: 640px) {
+    .h1 { @apply text-3xl; }
+    .h2 { @apply text-2xl; }
+    .h3 { @apply text-xl; }
+    .h4 { @apply text-lg; }
+    .h5 { @apply text-base; }
   }
-
-  .h3-mobile {
-    @apply text-mobile-h2 font-semibold tracking-tight;
-  }
-
-  .h4-mobile {
-    @apply text-mobile-h3 font-semibold tracking-tight;
-  }
-
-  /* 徽章样式 */
-  .badge {
-    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none;
-  }
-
-  .badge-primary {
-    @apply bg-indigo-100 text-indigo-800 dark:bg-indigo-800/30 dark:text-indigo-200;
-  }
-
-  .badge-secondary {
-    @apply bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200;
-  }
-
-  .badge-success {
-    @apply bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-200;
-  }
-
-  .badge-warning {
-    @apply bg-orange-100 text-orange-800 dark:bg-orange-800/30 dark:text-orange-200;
-  }
-
-  .badge-error {
-    @apply bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-200;
-  }
-
-  /* 动画 - 苹果风格 */
-  .animate-fade-in {
-    animation: fadeIn 0.6s ease-out;
- }
-
-  .animate-slide-up {
-    animation: slideUp 0.5s ease-out;
-  }
-
-  .animate-slide-up-mobile {
-    animation: slideUpMobile 0.4s ease-out;
-  }
-
-  .animate-bounce-gentle {
-    animation: bounceGentle 0.4s ease-out;
- }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
- @keyframes slideUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
- }
-
-  @keyframes slideUpMobile {
-    from { opacity: 0; transform: translateY(40px); }
-    to { opacity: 1; transform: translateY(0); }
- }
-
-  @keyframes bounceGentle {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(0.98); }
- }
 }
 
-/* CSS变量主题 */
+/* 工具类 */
+@layer utilities {
+  /* 文本样式 */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* 背景样式 */
+  .bg-gradient-radial {
+    background: radial-gradient(circle at center, var(--tw-gradient-stops));
+  }
+
+  .bg-gradient-conic {
+    background: conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops));
+  }
+
+  /* 动画延迟 */
+  .animate-delay-100 { animation-delay: 100ms; }
+  .animate-delay-200 { animation-delay: 200ms; }
+  .animate-delay-300 { animation-delay: 300ms; }
+  .animate-delay-500 { animation-delay: 500ms; }
+  .animate-delay-700 { animation-delay: 700ms; }
+  .animate-delay-1000 { animation-delay: 1000ms; }
+
+  /* 安全区域 */
+  .pt-safe { padding-top: env(safe-area-inset-top); }
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+  .pl-safe { padding-left: env(safe-area-inset-left); }
+  .pr-safe { padding-right: env(safe-area-inset-right); }
+
+  /* 玻璃效果 */
+  .glass {
+    @apply bg-white/80 dark:bg-gray-900/80;
+    @apply backdrop-blur-lg;
+    @apply border border-white/20 dark:border-gray-700/20;
+  }
+
+  .glass-strong {
+    @apply bg-white/60 dark:bg-gray-900/60;
+    @apply backdrop-blur-xl;
+    @apply border border-white/30 dark:border-gray-700/30;
+  }
+
+  /* 阴影效果 */
+  .shadow-glow {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+  }
+
+  .shadow-glow-lg {
+    box-shadow: 0 0 40px rgba(99, 102, 241, 0.2);
+  }
+
+  /* 隐藏滚动条 */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 移动端强制样式 - 确保一致性 */
+  @media (max-width: 640px) {
+    /* 强制所有按钮在移动端使用统一尺寸 */
+    button {
+      min-height: 48px !important;
+      height: 48px !important;
+      padding: 0 16px !important;
+      font-size: 16px !important;
+    }
+    
+    /* 强制所有输入框在移动端使用统一尺寸 */
+    input {
+      min-height: 48px !important;
+      height: 48px !important;
+      padding: 0 16px !important;
+      font-size: 16px !important;
+    }
+    
+    /* 有图标的输入框调整左边距 */
+    input[style*="pl-"] {
+      padding-left: 48px !important;
+    }
+    
+    /* 有图标的输入框调整右边距 */
+    input[style*="pr-"] {
+      padding-right: 48px !important;
+    }
+
+    .mobile-optimized {
+      @apply px-4 max-w-full;
+    }
+
+    .mobile-card {
+      @apply rounded-2xl p-4;
+    }
+
+    .mobile-btn {
+      @apply h-12 px-4 text-base min-h-[48px];
+    }
+
+    .mobile-input {
+      @apply h-12 px-3 text-base min-h-[48px];
+    }
+  }
+}
+
+/* 自定义动画 */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* 主题变量保持向后兼容 */
 :root {
   --color-primary: 99 102 241;
- --color-primary-foreground: 255 255 255;
+  --color-primary-foreground: 255 255 255;
   --color-secondary: 241 245 249;
   --color-secondary-foreground: 15 23 42;
   --color-accent: 168 85 247;
@@ -291,7 +488,7 @@ body.loading {
   --color-success: 74 222 128;
   --color-warning: 251 146 60;
   --color-error: 248 113 113;
- --color-background: 15 23 42;
+  --color-background: 15 23 42;
   --color-foreground: 248 250 252;
   --color-muted: 30 41 59;
   --color-muted-foreground: 148 163 184;
@@ -299,106 +496,26 @@ body.loading {
   --color-ring: 129 140 248;
 }
 
-/* 应用主题变量 */
-body {
-  background: rgb(var(--color-background));
-  color: rgb(var(--color-foreground));
-}
+/* 向后兼容的文本样式 */
+.text-muted { color: rgb(var(--color-muted-foreground)); }
+.text-primary { color: rgb(var(--color-primary)); }
+.text-success { color: rgb(var(--color-success)); }
+.text-warning { color: rgb(var(--color-warning)); }
+.text-error { color: rgb(var(--color-error)); }
+.bg-muted { background: rgb(var(--color-muted)); }
 
-/* 主题样式类 */
-.text-muted {
-  color: rgb(var(--color-muted-foreground));
-}
 
-.text-primary {
-  color: rgb(var(--color-primary));
-}
-
-.text-success {
-  color: rgb(var(--color-success));
-}
-
-.text-warning {
-  color: rgb(var(--color-warning));
-}
-
-.text-error {
-  color: rgb(var(--color-error));
-}
-
-.bg-muted {
-  background: rgb(var(--color-muted));
-}
-
-/* 移动端优化样式 */
-@media (max-width: 640px) {
-  .container {
-    @apply px-4;
+/* 打印样式 */
+@media print {
+  .no-print {
+    display: none !important;
   }
-
+  
+  body {
+    @apply text-black bg-white;
+  }
+  
   .card {
-    @apply rounded-2xl p-4;
-  }
-
-  .card-header {
-    @apply p-4;
-  }
-
-  .card-body {
-    @apply p-4;
-  }
-
-  .card-footer {
-    @apply p-4;
-  }
-
-  .tool-card {
-    @apply h-40;
-  }
-
-  .btn {
-    @apply h-12 px-4 py-3 text-base min-h-[48px];
-  }
-
-  .input {
-    @apply h-12 px-3 py-3 text-base min-h-[48px];
-  }
-
-  .h1 {
-    @apply text-3xl;
-  }
-
-  .h2 {
-    @apply text-2xl;
-  }
-
-  .h3 {
-    @apply text-xl;
-  }
-
-  .h4 {
-    @apply text-lg;
-  }
-}
-
-/* 防止iOS缩放 */
-@media screen and (max-width: 768px) {
-  select, textarea, input[type="text"], input[type="password"],
-  input[type="datetime"], input[type="datetime-local"],
-  input[type="date"], input[type="month"], input[type="time"],
-  input[type="week"], input[type="number"], input[type="email"],
-  input[type="url"] {
-    font-size: 16px;
-  }
-}
-
-/* 触摸优化 */
-@media (hover: none) and (pointer: coarse) {
-  .card-hover {
-    @apply shadow-2xl -translate-y-2 border-gray-300/70 dark:border-gray-700/70;
-  }
-
-  .btn {
-    @apply active:scale-95;
+    @apply border border-gray-300 shadow-none;
   }
 }

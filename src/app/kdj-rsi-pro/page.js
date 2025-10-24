@@ -376,7 +376,6 @@ export default function KDJRSIProPage() {
                   </div>
                   <Button
                     variant="outline"
-                    size="sm"
                     onClick={() => setShowAdvanced(!showAdvanced)}
                   >
                     <Settings className="w-4 h-4 mr-2" />
@@ -511,7 +510,6 @@ export default function KDJRSIProPage() {
                     disabled={isLoading || !jValue || !rsiValue}
                     loading={isLoading}
                     className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
-                    size="lg"
                   >
                     {isLoading ? '分析中...' : '开始专业分析'}
                   </Button>
@@ -519,7 +517,6 @@ export default function KDJRSIProPage() {
                     variant="outline"
                     onClick={handleClear}
                     disabled={isLoading}
-                    size="lg"
                   >
                     清除结果
                   </Button>

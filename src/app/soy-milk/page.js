@@ -61,17 +61,28 @@ export default function SoyMilkPage() {
   const [result, setResult] = useState(null)
   const [errors, setErrors] = useState({})
   const [showPresets, setShowPresets] = useState(false)
-  const [currentTime, setCurrentTime] = useState(new Date())
+  const [currentTime, setCurrentTime] = useState(null)
   const [countdown, setCountdown] = useState(null)
+  const [isClient, setIsClient] = useState(false)
+
+  // 客户端检测
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   // 更新当前时间
   useEffect(() => {
+    if (!isClient) return
+    
+    // 只在客户端挂载后才开始更新时间
+    setCurrentTime(new Date())
+    
     const timer = setInterval(() => {
       setCurrentTime(new Date())
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [])
+  }, [isClient])
 
   // 倒计时更新
   useEffect(() => {
@@ -208,6 +219,7 @@ export default function SoyMilkPage() {
 
   // 格式化时间显示
   const formatTime = (date) => {
+    if (!date) return '--:--:--'
     return new Intl.DateTimeFormat('zh-CN', {
       month: 'numeric',
       day: 'numeric',
@@ -245,10 +257,12 @@ export default function SoyMilkPage() {
             <h1 className="h2">豆浆助手</h1>
           </div>
 
-          <ThemeToggle />
+          <div className="w-10 h-10">
+            <ThemeToggle />
+          </div>
         </header>
 
-        <main className="max-w-2xl mx-auto space-y-8">
+        <main className="max-w-2xl mx-auto px-4 space-y-8">
           {/* 工具介绍 */}
           <section className="text-center animate-fade-in">
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -258,8 +272,8 @@ export default function SoyMilkPage() {
 
           {/* 当前时间显示 */}
           <section className="animate-slide-up" style={{ animationDelay: '200ms' }}>
-            <Card hover className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-90/20 dark:to-yellow-900/20 border-orange-200 dark:border-orange-800" mobile={isMobile}>
-              <CardBody mobile={isMobile}>
+            <Card hover className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-90/20 dark:to-yellow-900/20 border-orange-200 dark:border-orange-800">
+              <CardBody>
                 <div className="text-center">
                   <div className="flex items-center justify-center mb-3">
                     <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center mr-3">
@@ -269,7 +283,7 @@ export default function SoyMilkPage() {
                       当前时间
                     </span>
                   </div>
-                  <div className="text-3xl font-bold text-orange-900 dark:text-orange-100 mb-1">
+                  <div className="text-3xl font-bold text-orange-900 dark:text-orange-100 mb-1" suppressHydrationWarning>
                     {formatTime(currentTime)}
                   </div>
                   <div className="text-sm text-orange-700 dark:text-orange-30">
@@ -282,8 +296,8 @@ export default function SoyMilkPage() {
 
           {/* 输入表单 */}
           <section className="animate-slide-up" style={{ animationDelay: '300ms' }}>
-            <Card hover mobile={isMobile}>
-              <CardHeader mobile={isMobile}>
+            <Card hover>
+              <CardHeader>
                 <div className="flex items-center">
                   <div className="w-12 h-12 bg-orange-10 rounded-xl flex items-center justify-center mr-4">
                     <Coffee className="w-6 h-6 text-orange-600" />
@@ -295,7 +309,7 @@ export default function SoyMilkPage() {
                 </div>
               </CardHeader>
 
-              <CardBody className="space-y-6" mobile={isMobile}>
+              <CardBody className="space-y-6">
                 {/* 目标饮用时间 */}
                 <div className="relative">
                   <label className="block text-sm font-medium text-foreground mb-2">
@@ -309,14 +323,11 @@ export default function SoyMilkPage() {
                       error={errors.targetTime}
                       icon={<AlarmClock className="w-4 h-4" />}
                       required
-                      mobile={isMobile}
                     />
                       <Button
                         variant="outline"
-                        size="sm"
                         onClick={() => setShowPresets(!showPresets)}
                         className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                        mobile={isMobile}
                       >
                         <Timer className="w-4 h-4" />
                       </Button>
@@ -326,10 +337,11 @@ export default function SoyMilkPage() {
                   {showPresets && (
                     <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-10 max-h-64 overflow-y-auto">
                       {presetDrinkTimes.map((preset, index) => (
-                        <button
+                        <Button
                           key={index}
                           onClick={() => setPresetDrinkTime(preset.time)}
-                          className="w-full text-left px-4 py-3 hover:bg-muted transition-colors border-b border-gray-100 dark:border-gray-700 last:border-b-0 first:rounded-t-xl last:rounded-b-xl"
+                          variant="ghost"
+                          className="w-full justify-start text-left px-4 py-3 h-auto hover:bg-muted transition-colors border-b border-gray-100 dark:border-gray-700 last:border-b-0 first:rounded-t-xl last:rounded-b-xl rounded-none"
                         >
                           <div className="flex justify-between items-center">
                             <div>
@@ -344,7 +356,7 @@ export default function SoyMilkPage() {
                               {preset.time}
                             </div>
                           </div>
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   )}
@@ -366,7 +378,6 @@ export default function SoyMilkPage() {
                     max="120"
                     step="1"
                     required
-                    mobile={isMobile}
                   />
 
                   {/* 预设制作时长 */}
@@ -375,10 +386,8 @@ export default function SoyMilkPage() {
                       <Button
                         key={index}
                         variant={parseInt(makingTime) === preset.time ? 'primary' : 'outline'}
-                        size="sm"
                         onClick={() => setPresetMakingTime(preset.time)}
                         className="text-xs py-3"
-                        mobile={isMobile}
                       >
                         {preset.label}
                         <span className="ml-1 opacity-75">({preset.time}分)</span>
@@ -391,8 +400,6 @@ export default function SoyMilkPage() {
                   <Button
                     onClick={handleCalculate}
                     className="flex-1 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800"
-                    size="lg"
-                    mobile={isMobile}
                   >
                     <Play className="w-4 h-4 mr-2" />
                     计算预约时间
@@ -400,8 +407,6 @@ export default function SoyMilkPage() {
                   <Button
                     variant="outline"
                     onClick={handleClear}
-                    size="lg"
-                    mobile={isMobile}
                   >
                     清除结果
                   </Button>
@@ -415,8 +420,8 @@ export default function SoyMilkPage() {
             <>
               {/* 预约结果 */}
               <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
-                <Card hover mobile={isMobile}>
-                  <CardHeader mobile={isMobile}>
+                <Card hover>
+                  <CardHeader>
                     <div className="text-center">
                       <div className="inline-flex items-center px-4 py-2 rounded-full bg-success/10 text-success mb-4">
                         <CheckCircle className="w-5 h-5 mr-2" />
@@ -425,7 +430,7 @@ export default function SoyMilkPage() {
                     </div>
                   </CardHeader>
 
-                  <CardBody className="space-y-6" mobile={isMobile}>
+                  <CardBody className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* 预约时间 */}
                       <div className="bg-muted/50 rounded-xl p-6">
@@ -516,8 +521,8 @@ export default function SoyMilkPage() {
 
               {/* 温馨提示 */}
               <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
-                <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-80" mobile={isMobile}>
-                  <CardBody mobile={isMobile}>
+                <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-80">
+                  <CardBody>
                     <div className="flex items-start">
                       <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
                         <Info className="w-4 h-4 text-blue-600" />
@@ -543,8 +548,8 @@ export default function SoyMilkPage() {
           {/* 错误提示 */}
           {result && result.error && (
             <section className="animate-fade-in">
-              <Card className="border-error bg-error/10" mobile={isMobile}>
-                <CardBody mobile={isMobile}>
+              <Card className="border-error bg-error/10">
+                <CardBody>
                   <div className="flex items-center text-error">
                     <AlertCircle className="w-5 h-5 mr-3" />
                     <div>
@@ -560,8 +565,8 @@ export default function SoyMilkPage() {
           {/* 历史记录 */}
           {history.length > 0 && (
             <section className="animate-fade-in" style={{ animationDelay: '600ms' }}>
-              <Card hover mobile={isMobile}>
-                <CardHeader mobile={isMobile}>
+              <Card hover>
+                <CardHeader>
                   <h3 className="h4 mb-2 flex items-center">
                     <div className="w-8 h-8 bg-orange-10 rounded-lg flex items-center justify-center mr-3">
                       <Calendar className="w-4 h-4 text-orange-600" />
@@ -571,7 +576,7 @@ export default function SoyMilkPage() {
                   <p className="text-muted-foreground">查看最近的历史预约记录</p>
                 </CardHeader>
 
-                <CardBody mobile={isMobile}>
+                <CardBody>
                   <div className="space-y-3 max-h-64 overflow-y-auto">
                     {history.map((entry) => (
                       <div
@@ -604,8 +609,8 @@ export default function SoyMilkPage() {
 
           {/* 使用说明 */}
           <section className="animate-fade-in" style={{ animationDelay: '700ms' }}>
-            <Card className="bg-muted/30" mobile={isMobile}>
-              <CardHeader mobile={isMobile}>
+            <Card className="bg-muted/30">
+              <CardHeader>
                 <h3 className="h4 mb-2 flex items-center">
                   <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
                     <Info className="w-4 h-4 text-primary" />
@@ -615,7 +620,7 @@ export default function SoyMilkPage() {
                 <p className="text-muted-foreground">了解如何使用豆浆助手</p>
               </CardHeader>
 
-              <CardBody mobile={isMobile}>
+              <CardBody>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-3">
                     <h4 className="font-semibold text-primary">功能说明</h4>
