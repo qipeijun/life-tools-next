@@ -7,6 +7,12 @@ on:
     branches:
       - master
 
+# 配置权限，允许GitHub Actions推送到gh-pages分支
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest

@@ -51,7 +51,17 @@ images: { unoptimized: true }
 basePath: '/repo-name'
 ```
 
-## 📝 GitHub Pages 设置
+## 📝 GitHub 仓库配置
+
+### 1. 启用GitHub Actions写入权限
+
+1. 进入仓库 **Settings** → **Actions** → **General**
+2. 滚动到 **Workflow permissions**
+3. 选择 **Read and write permissions**
+4. 勾选 **Allow GitHub Actions to create and approve pull requests**
+5. 保存设置
+
+### 2. GitHub Pages 设置
 
 1. 进入仓库 **Settings** → **Pages**
 2. **Source** 选择 `Deploy from a branch`
