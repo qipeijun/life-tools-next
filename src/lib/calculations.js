@@ -86,19 +86,46 @@ export function computeSmartGridRange(rsi, bollUpper, bollLower, maxOffset = 0.1
   }
 }
 
-// 做T利润计算
-export function calculateTDayProfit(buyPrice, sellPrice, quantity, commission = 0.0003) {
-  const buyCost = buyPrice * quantity * (1 + commission)
-  const sellIncome = sellPrice * quantity * (1 - commission - 0.001) // 0.001是印花税
+// 做T利润计算（增强版 - 支持固定和比例手续费）
+export function calculateTDayProfit(
+  buyPrice, 
+  sellPrice, 
+  quantity, 
+  feeConfig = { type: 'ratio', value: 0.0003 }
+) {
+  let buyFee, sellFee
+  
+  if (feeConfig.type === 'fixed') {
+    // 固定手续费模式
+    buyFee = feeConfig.value
+    sellFee = feeConfig.value
+  } else {
+    // 比例手续费模式
+    buyFee = buyPrice * quantity * feeConfig.value
+    sellFee = sellPrice * quantity * feeConfig.value
+  }
+  
+  const stampDuty = sellPrice * quantity * 0.001 // 印花税（卖出时收取）
+  const buyCost = buyPrice * quantity + buyFee
+  const sellIncome = sellPrice * quantity - sellFee - stampDuty
   const profit = sellIncome - buyCost
   const profitRate = (profit / buyCost) * 100
+  const totalFee = buyFee + sellFee + stampDuty
+  
+  // 盈亏平衡价格（考虑所有成本）
+  const breakEvenPrice = (buyCost + sellFee + stampDuty) / quantity
 
   return {
     buyCost: buyCost.toFixed(2),
     sellIncome: sellIncome.toFixed(2),
     profit: profit.toFixed(2),
     profitRate: profitRate.toFixed(2),
-    commissionAmount: (buyPrice * quantity * commission + sellPrice * quantity * (commission + 0.001)).toFixed(2)
+    buyFee: buyFee.toFixed(2),
+    sellFee: sellFee.toFixed(2),
+    stampDuty: stampDuty.toFixed(2),
+    totalFee: totalFee.toFixed(2),
+    breakEvenPrice: breakEvenPrice.toFixed(3),
+    commissionAmount: totalFee.toFixed(2) // 保持向后兼容
   }
 }
 

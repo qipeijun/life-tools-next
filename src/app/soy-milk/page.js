@@ -1,69 +1,40 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card, CardHeader, CardBody } from '../../components/ui/Card'
-import { Input } from '../../components/ui/Input'
-import { Button } from '../../components/ui/Button'
 import { ThemeToggle } from '../../components/ui/ThemeToggle'
 import { useLocalStorage } from '../../hooks/useLocalStorage'
 import { calculateSoyMilkTime } from '../../lib/calculations'
 import { validateTime, validateNumber } from '../../lib/validations'
+import { QuickActions } from '../../components/ui/QuickActions'
+import { SegmentedControl } from '../../components/ui/SegmentedControl'
+import { ResultCard } from '../../components/ui/ResultCard'
 import {
   Coffee,
   Clock,
-  AlarmClock,
-  Calendar,
-  Info,
-  AlertCircle,
-  CheckCircle,
+  ArrowLeft,
   Play,
-  Settings,
-  Timer,
-  ArrowLeft
 } from 'lucide-react'
 import Link from 'next/link'
 
 export default function SoyMilkPage() {
-  const [isMobile, setIsMobile] = useState(false)
-
   // 缓存键名
   const CACHE_KEYS = {
     TARGET_TIME: 'soymilk_targetTime',
     MAKING_TIME: 'soymilk_makingTime',
-    PRESET_TIMES: 'soymilk_presetTimes',
-    HISTORY: 'soymilk_history'
   }
-
-  // 预设制作时长
-  const presetMakingTimes = [
-    { label: '快速模式', time: 15, description: '适合少量豆浆' },
-    { label: '标准模式', time: 25, description: '常规制作时长' },
-    { label: '浓浆模式', time: 35, description: '口感更浓郁' },
-    { label: '米糊模式', time: 20, description: '制作米糊' }
-  ]
-
-  // 预设饮用时间
-  const presetDrinkTimes = [
-    { label: '早餐时间', time: '07:30', description: '早上7:30' },
-    { label: '早茶时间', time: '10:00', description: '上午10:00' },
-    { label: '午餐时间', time: '12:30', description: '中午12:30' },
-    { label: '下午茶', time: '15:30', description: '下午3:30' },
-    { label: '晚餐时间', time: '18:30', description: '晚上6:30' },
-    { label: '夜宵时间', time: '21:00', description: '晚上9:00' }
-  ]
 
   // 表单状态
   const [targetTime, setTargetTime] = useLocalStorage(CACHE_KEYS.TARGET_TIME, '')
   const [makingTime, setMakingTime] = useLocalStorage(CACHE_KEYS.MAKING_TIME, '25')
-  const [history, setHistory] = useLocalStorage(CACHE_KEYS.HISTORY, [])
 
   // UI状态
   const [result, setResult] = useState(null)
   const [errors, setErrors] = useState({})
-  const [showPresets, setShowPresets] = useState(false)
   const [currentTime, setCurrentTime] = useState(null)
   const [countdown, setCountdown] = useState(null)
   const [isClient, setIsClient] = useState(false)
+  const [selectedTimeScenario, setSelectedTimeScenario] = useState(null)
+  const [selectedModeScenario, setSelectedModeScenario] = useState('standard')
 
   // 客户端检测
   useEffect(() => {
@@ -74,9 +45,7 @@ export default function SoyMilkPage() {
   useEffect(() => {
     if (!isClient) return
     
-    // 只在客户端挂载后才开始更新时间
     setCurrentTime(new Date())
-    
     const timer = setInterval(() => {
       setCurrentTime(new Date())
     }, 1000)
@@ -87,30 +56,45 @@ export default function SoyMilkPage() {
   // 倒计时更新
   useEffect(() => {
     if (result && result.timeRemaining > 0) {
+      setCountdown(result.timeRemaining)
       const timer = setInterval(() => {
-        setCountdown(Math.max(0, result.timeRemaining - 1000))
+        setCountdown((prev) => Math.max(0, prev - 1000))
       }, 1000)
 
       return () => clearInterval(timer)
     }
   }, [result])
 
-  // 页面初始化
-  useEffect(() => {
-    // 检测是否为移动设备
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 640)
+  // 快速时间场景
+  const timeScenarios = [
+    { label: '早餐', value: '07:30' },
+    { label: '午餐', value: '12:30' },
+    { label: '晚餐', value: '18:30' },
+  ]
+
+  // 制作模式
+  const modeOptions = [
+    { label: '快速', value: 'fast' },
+    { label: '标准', value: 'standard' },
+    { label: '浓浆', value: 'thick' },
+  ]
+
+  // 处理快速时间选择
+  const handleTimeScenarioSelect = (time) => {
+    setSelectedTimeScenario(time)
+    setTargetTime(time)
+  }
+
+  // 处理模式选择
+  const handleModeSelect = (mode) => {
+    setSelectedModeScenario(mode)
+    const modeTime = {
+      fast: '15',
+      standard: '25',
+      thick: '35',
     }
-    
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    
-    setTimeout(() => {
-      document.body.classList.remove('loading')
-    }, 300)
-    
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
+    setMakingTime(modeTime[mode])
+  }
 
   // 输入验证
   const validateInputs = () => {
@@ -134,12 +118,11 @@ export default function SoyMilkPage() {
     return Object.keys(newErrors).length === 0
   }
 
-   // 计算预约时间
+  // 计算预约时间
   const handleCalculate = () => {
     if (!validateInputs()) return
 
     try {
-      // 将时间字符串转换为完整的日期时间
       const today = new Date()
       const [hours, minutes] = targetTime.split(':')
       const targetDateTime = new Date(
@@ -160,37 +143,15 @@ export default function SoyMilkPage() {
         parseInt(makingTime)
       )
 
-      // 添加到历史记录
-      const historyEntry = {
-        id: Date.now(),
-        timestamp: new Date().toISOString(),
-        targetTime: calculationResult.targetTime,
-        appointmentTime: calculationResult.appointmentTime,
-        makingTime: calculationResult.makingTime
-      }
-
-      setHistory(prev => [historyEntry, ...prev.slice(0, 4)]) // 保留最近5条
       setResult(calculationResult)
       setCountdown(calculationResult.timeRemaining)
-
     } catch (error) {
       console.error('计算失败:', error)
       setResult({
         error: true,
-        message: '计算失败，请检查输入参数'
+        message: '计算失败，请检查输入参数',
       })
     }
-  }
-
-  // 设置预设饮用时间
-  const setPresetDrinkTime = (time) => {
-    setTargetTime(time)
-    setShowPresets(false)
-  }
-
-  // 设置预设制作时长
-  const setPresetMakingTime = (time) => {
-    setMakingTime(time.toString())
   }
 
   // 清除结果
@@ -209,441 +170,213 @@ export default function SoyMilkPage() {
     const seconds = Math.floor((milliseconds % (1000 * 60)) / 1000)
 
     if (hours > 0) {
-      return `${hours}小时${minutes}分${seconds}秒`
-    } else if (minutes > 0) {
-      return `${minutes}分${seconds}秒`
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
     } else {
-      return `${seconds}秒`
+      return `${minutes}:${seconds.toString().padStart(2, '0')}`
     }
   }
 
   // 格式化时间显示
   const formatTime = (date) => {
-    if (!date) return '--:--:--'
-    return new Intl.DateTimeFormat('zh-CN', {
-      month: 'numeric',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    }).format(date)
+    if (!date) return '--:--'
+    const hours = date.getHours().toString().padStart(2, '0')
+    const minutes = date.getMinutes().toString().padStart(2, '0')
+    return `${hours}:${minutes}`
   }
 
   // 检查是否需要立即开始
   const needsImmediateStart = result && result.appointmentTime <= new Date()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      <div className="container mx-auto px-4 py-8">
-        {/* 背景装饰 */}
-        <div className="fixed inset-0 -z-10 overflow-hidden">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/2 right-1/4 w-96 h-96 bg-yellow-500/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl"></div>
-        </div>
-
-        {/* 头部导航 */}
-        <header className="flex items-center justify-between mb-8 animate-slide-up">
+    <div className="min-h-screen bg-gray-50 dark:bg-black">
+      <div className="mx-auto max-w-2xl px-4 sm:px-6 py-4 sm:py-6">
+        {/* 导航栏 */}
+        <header className="flex items-center justify-between mb-6 sm:mb-8">
           <Link
             href="/"
-            className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors"
+            className="inline-flex items-center gap-2 text-blue-500 font-medium active:scale-95 transition-transform"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            返回首页
+            <ArrowLeft className="w-5 h-5" />
+            <span>返回</span>
           </Link>
-
-          <div className="flex items-center space-x-2">
-            <Coffee className="w-6 h-6 text-orange-600 animate-pulse" />
-            <h1 className="h2">豆浆助手</h1>
-          </div>
-
-          <div className="w-10 h-10">
-            <ThemeToggle />
-          </div>
+          <ThemeToggle />
         </header>
 
-        <main className="max-w-2xl mx-auto px-4 space-y-8">
-          {/* 工具介绍 */}
-          <section className="text-center animate-fade-in">
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              智能预约制作，确保在最佳时间享用热腾腾的豆浆
-            </p>
+        {/* Large Title */}
+        <h1 className="ios-large-title mb-8">☕️ 豆浆助手</h1>
+
+        {/* 主要内容 */}
+        <div className="ios-spacing-section">
+          {/* 当前时间 */}
+          <section>
+            <div className="ios-card bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/10 dark:to-orange-900/10 border-amber-200 dark:border-amber-800/30">
+              <div className="text-center">
+                <div className="text-sm text-amber-700 dark:text-amber-400 mb-2">
+                  当前时间
+                </div>
+                <div
+                  className="text-4xl font-bold text-amber-900 dark:text-amber-100 tabular-nums"
+                  suppressHydrationWarning
+                >
+                  {formatTime(currentTime)}
+                </div>
+              </div>
+            </div>
           </section>
 
-          {/* 当前时间显示 */}
-          <section className="animate-slide-up" style={{ animationDelay: '200ms' }}>
-            <Card hover className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-90/20 dark:to-yellow-900/20 border-orange-200 dark:border-orange-800">
-              <CardBody>
-                <div className="text-center">
-                  <div className="flex items-center justify-center mb-3">
-                    <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center mr-3">
-                      <Clock className="w-5 h-5 text-orange-600" />
-                    </div>
-                    <span className="font-medium text-orange-800 dark:text-orange-20">
-                      当前时间
-                    </span>
-                  </div>
-                  <div className="text-3xl font-bold text-orange-900 dark:text-orange-100 mb-1" suppressHydrationWarning>
-                    {formatTime(currentTime)}
-                  </div>
-                  <div className="text-sm text-orange-700 dark:text-orange-30">
-                    系统实时时间
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
+          {/* 快速选择时间 */}
+          <section>
+            <h2 className="ios-section-header">快速选择</h2>
+            <QuickActions
+              options={timeScenarios}
+              selected={selectedTimeScenario}
+              onChange={handleTimeScenarioSelect}
+              columns={3}
+            />
           </section>
 
-          {/* 输入表单 */}
-          <section className="animate-slide-up" style={{ animationDelay: '300ms' }}>
-            <Card hover>
-              <CardHeader>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-orange-10 rounded-xl flex items-center justify-center mr-4">
-                    <Coffee className="w-6 h-6 text-orange-600" />
-                  </div>
-                  <div>
-                    <h2 className="h3 mb-1">预约设置</h2>
-                    <p className="text-muted-foreground">设置目标饮用时间和制作参数</p>
-                  </div>
-                </div>
-              </CardHeader>
-
-              <CardBody className="space-y-6">
-                {/* 目标饮用时间 */}
-                <div className="relative">
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    目标饮用时间
-                  </label>
-                  <div className="relative">
-                    <Input
-                      type="time"
-                      value={targetTime}
-                      onChange={(e) => setTargetTime(e.target.value)}
-                      error={errors.targetTime}
-                      icon={<AlarmClock className="w-4 h-4" />}
-                      required
-                    />
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowPresets(!showPresets)}
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                      >
-                        <Timer className="w-4 h-4" />
-                      </Button>
-                  </div>
-
-                  {/* 预设时间下拉 */}
-                  {showPresets && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-10 max-h-64 overflow-y-auto">
-                      {presetDrinkTimes.map((preset, index) => (
-                        <Button
-                          key={index}
-                          onClick={() => setPresetDrinkTime(preset.time)}
-                          variant="ghost"
-                          className="w-full justify-start text-left px-4 py-3 h-auto hover:bg-muted transition-colors border-b border-gray-100 dark:border-gray-700 last:border-b-0 first:rounded-t-xl last:rounded-b-xl rounded-none"
-                        >
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <div className="font-medium text-foreground">
-                                {preset.label}
-                              </div>
-                              <div className="text-sm text-muted-foreground">
-                                {preset.description}
-                              </div>
-                            </div>
-                            <div className="text-lg font-bold text-orange-600">
-                              {preset.time}
-                            </div>
-                          </div>
-                        </Button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* 制作时长 */}
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    制作时长 (分钟)
-                  </label>
-                  <Input
-                    type="number"
-                    placeholder="请输入制作时长"
-                    value={makingTime}
-                    onChange={(e) => setMakingTime(e.target.value)}
-                    error={errors.makingTime}
-                    icon={<Clock className="w-4 h-4" />}
-                    min="1"
-                    max="120"
-                    step="1"
-                    required
-                  />
-
-                  {/* 预设制作时长 */}
-                  <div className="mt-4 grid grid-cols-2 gap-3">
-                    {presetMakingTimes.map((preset, index) => (
-                      <Button
-                        key={index}
-                        variant={parseInt(makingTime) === preset.time ? 'primary' : 'outline'}
-                        onClick={() => setPresetMakingTime(preset.time)}
-                        className="text-xs py-3"
-                      >
-                        {preset.label}
-                        <span className="ml-1 opacity-75">({preset.time}分)</span>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Button
-                    onClick={handleCalculate}
-                    className="flex-1 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800"
-                  >
-                    <Play className="w-4 h-4 mr-2" />
-                    计算预约时间
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={handleClear}
-                  >
-                    清除结果
-                  </Button>
-                </div>
-              </CardBody>
-            </Card>
+          {/* 饮用时间 */}
+          <section>
+            <h2 className="ios-section-header">饮用时间</h2>
+            <div className="ios-card">
+              <label className="ios-input-label">目标时间</label>
+              <input
+                type="time"
+                value={targetTime}
+                onChange={(e) => {
+                  setTargetTime(e.target.value)
+                  setSelectedTimeScenario(null)
+                }}
+                className="ios-input w-full text-center text-2xl"
+              />
+              {errors.targetTime && (
+                <p className="text-xs text-red-500 mt-2">{errors.targetTime}</p>
+              )}
+            </div>
           </section>
+
+          {/* 制作时长 */}
+          <section>
+            <h2 className="ios-section-header">制作时长</h2>
+            <div className="ios-card ios-spacing-group">
+              <SegmentedControl
+                options={modeOptions}
+                selected={selectedModeScenario}
+                onChange={handleModeSelect}
+              />
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {makingTime} 分钟
+                </div>
+                <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  {selectedModeScenario === 'fast' && '适合少量豆浆'}
+                  {selectedModeScenario === 'standard' && '常规制作时长'}
+                  {selectedModeScenario === 'thick' && '口感更浓郁'}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* 操作按钮 */}
+          <div className="flex gap-3">
+            <button
+              onClick={handleCalculate}
+              disabled={!targetTime}
+              className="ios-button-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span className="flex items-center justify-center gap-2">
+                <Play className="w-5 h-5" />
+                计算预约时间
+              </span>
+            </button>
+            {result && (
+              <button onClick={handleClear} className="ios-button-secondary">
+                清除
+              </button>
+            )}
+          </div>
 
           {/* 结果展示 */}
           {result && !result.error && (
-            <>
-              {/* 预约结果 */}
-              <section className="animate-fade-in" style={{ animationDelay: '400ms' }}>
-                <Card hover>
-                  <CardHeader>
-                    <div className="text-center">
-                      <div className="inline-flex items-center px-4 py-2 rounded-full bg-success/10 text-success mb-4">
-                        <CheckCircle className="w-5 h-5 mr-2" />
-                        <span className="font-bold">预约时间已计算</span>
-                      </div>
+            <section>
+              <h2 className="ios-section-header">预约时间</h2>
+              
+              {/* 预约时间卡片 */}
+              <div className="ios-card bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10 border-blue-200 dark:border-blue-800/30 mb-4">
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-2 mb-3">
+                    <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    <span className="text-sm font-medium text-blue-700 dark:text-blue-400">
+                      {needsImmediateStart ? '⚠️ 需立即开始' : '预约开始时间'}
+                    </span>
+                  </div>
+                  <div className="text-5xl font-bold text-blue-900 dark:text-blue-100 mb-2 tabular-nums">
+                    {formatTime(result.appointmentTime)}
+                  </div>
+                  <div className="text-sm text-blue-600 dark:text-blue-400">
+                    {needsImmediateStart
+                      ? '预约时间已过，建议立即开始制作'
+                      : '豆浆机开始制作的时间'}
+                  </div>
+                </div>
+              </div>
+
+              {/* 倒计时 */}
+              {!needsImmediateStart && countdown !== null && (
+                <div className="ios-card bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/10 dark:to-emerald-900/10 border-green-200 dark:border-green-800/30">
+                  <div className="text-center">
+                    <div className="text-sm text-green-700 dark:text-green-400 mb-2">
+                      距离预约开始还有
                     </div>
-                  </CardHeader>
-
-                  <CardBody className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* 预约时间 */}
-                      <div className="bg-muted/50 rounded-xl p-6">
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="font-semibold flex items-center">
-                            <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
-                              <AlarmClock className="w-4 h-4 text-orange-600" />
-                            </div>
-                            预约开始时间
-                          </h4>
-                          {needsImmediateStart && (
-                            <span className="badge badge-error">
-                              需立即开始
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-2xl font-bold mb-2">
-                          {formatTime(result.appointmentTime)}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          豆浆机开始制作的时间
-                        </div>
-                      </div>
-
-                      {/* 目标饮用时间 */}
-                      <div className="bg-muted/50 rounded-xl p-6">
-                        <div className="flex items-center mb-3">
-                          <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
-                            <Coffee className="w-4 h-4 text-orange-600" />
-                          </div>
-                          <h4 className="font-semibold">目标饮用时间</h4>
-                        </div>
-                        <div className="text-2xl font-bold mb-2">
-                          {formatTime(result.targetTime)}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          期望喝到热豆浆的时间
-                        </div>
-                      </div>
+                    <div
+                      className="text-4xl font-bold text-green-900 dark:text-green-100 tabular-nums"
+                      suppressHydrationWarning
+                    >
+                      {formatCountdown(countdown)}
                     </div>
+                  </div>
+                </div>
+              )}
 
-                    {/* 倒计时 */}
-                    {countdown !== null && (
-                      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="font-semibold flex items-center">
-                            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                              <Timer className="w-4 h-4 text-blue-600" />
-                            </div>
-                            {needsImmediateStart ? '已过期' : '距离预约开始'}
-                          </h4>
-                        </div>
-                        <div className={`text-3xl font-bold mb-2 ${
-                          needsImmediateStart ? 'text-error' : 'text-blue-600'
-                        }`}>
-                          {needsImmediateStart ? '请立即开始' : formatCountdown(countdown)}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {needsImmediateStart
-                            ? '预约时间已过，建议立即开始制作'
-                            : '剩余时间到预约开始'
-                          }
-                        </div>
-                      </div>
-                    )}
-
-                    {/* 制作信息 */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="bg-muted/50 rounded-xl p-6 text-center">
-                        <div className="text-xs text-muted-foreground mb-2">制作时长</div>
-                        <div className="text-2xl font-bold">
-                          {result.makingTime} 分钟
-                        </div>
-                      </div>
-                      <div className="bg-muted/50 rounded-xl p-6 text-center">
-                        <div className="text-xs text-muted-foreground mb-2">完成等待</div>
-                        <div className="text-2xl font-bold">
-                          约 {Math.ceil(result.makingTime * 0.2)} 分钟
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          冷却到适宜温度
-                        </div>
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-              </section>
-
-              {/* 温馨提示 */}
-              <section className="animate-fade-in" style={{ animationDelay: '500ms' }}>
-                <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-80">
-                  <CardBody>
-                    <div className="flex items-start">
-                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
-                        <Info className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-3">
-                          温馨提示
-                        </h4>
-                        <div className="space-y-2 text-sm text-blue-700 dark:text-blue-300">
-                          <p>• 请提前准备好豆子和水</p>
-                          <p>• 建议在预约开始前5分钟内准备好所有材料</p>
-                          <p>• 制作完成后豆浆会很热，请小心烫伤</p>
-                          <p>• 不同豆浆机型号可能有时间差异，请根据实际情况调整</p>
-                        </div>
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-              </section>
-            </>
+              {/* 详细信息 */}
+              <ResultCard
+                type="neutral"
+                title="预约详情"
+                value={`${makingTime} 分钟`}
+                subtitle="制作时长"
+                icon={<Coffee />}
+                details={[
+                  { label: '饮用时间', value: formatTime(result.targetTime) },
+                  { label: '预计完成', value: `约 ${Math.ceil(parseInt(makingTime) * 0.2)} 分钟后可饮用` },
+                ]}
+              />
+            </section>
           )}
 
           {/* 错误提示 */}
           {result && result.error && (
-            <section className="animate-fade-in">
-              <Card className="border-error bg-error/10">
-                <CardBody>
-                  <div className="flex items-center text-error">
-                    <AlertCircle className="w-5 h-5 mr-3" />
-                    <div>
-                      <h4 className="font-semibold">计算失败</h4>
-                      <p className="text-sm">{result.message}</p>
-                    </div>
-                  </div>
-                </CardBody>
-              </Card>
-            </section>
+            <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800/30 rounded-2xl p-4">
+              <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                {result.message}
+              </p>
+            </div>
           )}
 
-          {/* 历史记录 */}
-          {history.length > 0 && (
-            <section className="animate-fade-in" style={{ animationDelay: '600ms' }}>
-              <Card hover>
-                <CardHeader>
-                  <h3 className="h4 mb-2 flex items-center">
-                    <div className="w-8 h-8 bg-orange-10 rounded-lg flex items-center justify-center mr-3">
-                      <Calendar className="w-4 h-4 text-orange-600" />
-                    </div>
-                    最近预约记录
-                  </h3>
-                  <p className="text-muted-foreground">查看最近的历史预约记录</p>
-                </CardHeader>
-
-                <CardBody>
-                  <div className="space-y-3 max-h-64 overflow-y-auto">
-                    {history.map((entry) => (
-                      <div
-                        key={entry.id}
-                        className="flex items-center justify-between p-4 bg-muted/50 rounded-xl"
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                            <Coffee className="w-4 h-4 text-orange-600" />
-                          </div>
-                          <div>
-                            <div className="font-medium">
-                              {formatTime(new Date(entry.appointmentTime))}
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                              制作 {entry.makingTime} 分钟
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {new Date(entry.timestamp).toLocaleDateString('zh-CN')}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardBody>
-              </Card>
-            </section>
-          )}
-
-          {/* 使用说明 */}
-          <section className="animate-fade-in" style={{ animationDelay: '700ms' }}>
-            <Card className="bg-muted/30">
-              <CardHeader>
-                <h3 className="h4 mb-2 flex items-center">
-                  <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
-                    <Info className="w-4 h-4 text-primary" />
-                  </div>
-                  使用说明
-                </h3>
-                <p className="text-muted-foreground">了解如何使用豆浆助手</p>
-              </CardHeader>
-
-              <CardBody>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-primary">功能说明</h4>
-                    <div className="space-y-2 text-sm text-muted-foreground">
-                      <p>• <strong>目标时间：</strong>您希望喝到豆浆的时间</p>
-                      <p>• <strong>制作时长：</strong>根据豆浆机型号和食材量调整</p>
-                      <p>• <strong>预约时间：</strong>系统自动计算，确保准时完成</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-accent">使用技巧</h4>
-                    <div className="space-y-2 text-sm text-muted-foreground">
-                      <p>• <strong>倒计时提醒：</strong>实时显示距离预约开始的剩余时间</p>
-                      <p>• <strong>历史记录：</strong>保存最近的预约记录，方便查看</p>
-                      <p>• <strong>预设模式：</strong>快速选择常用的制作模式和饮用时间</p>
-                    </div>
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
+          {/* 使用提示 */}
+          <section>
+            <h2 className="ios-section-header">使用提示</h2>
+            <div className="ios-card">
+              <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                <p>• <strong>快速选择：</strong>一键选择常用的饮用时间</p>
+                <p>• <strong>制作模式：</strong>根据豆浆机型号选择合适的时长</p>
+                <p>• <strong>倒计时：</strong>实时显示距离预约开始的剩余时间</p>
+                <p className="text-xs text-gray-500 pt-2 border-t border-gray-200 dark:border-gray-700">
+                  💡 建议提前5分钟准备好材料
+                </p>
+              </div>
+            </div>
           </section>
-        </main>
+        </div>
       </div>
     </div>
   )

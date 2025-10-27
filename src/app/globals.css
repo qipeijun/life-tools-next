@@ -505,6 +505,143 @@
 .bg-muted { background: rgb(var(--color-muted)); }
 
 
+/* iOS风格样式系统 */
+@layer components {
+  /* iOS Large Title */
+  .ios-large-title {
+    @apply text-3xl sm:text-4xl font-bold tracking-tight;
+    @apply text-gray-900 dark:text-white;
+    line-height: 1.2;
+    letter-spacing: 0.37px;
+  }
+
+  /* iOS Section Header */
+  .ios-section-header {
+    @apply text-xs sm:text-sm font-semibold uppercase tracking-wide;
+    @apply text-gray-500 dark:text-gray-400;
+    @apply mb-3;
+  }
+
+  /* iOS卡片 */
+  .ios-card {
+    @apply bg-white dark:bg-gray-900;
+    @apply rounded-2xl;
+    @apply border border-gray-100 dark:border-gray-800;
+    @apply shadow-sm;
+    @apply p-5 sm:p-6;
+    @apply transition-all duration-200;
+  }
+
+  .ios-card:active {
+    @apply scale-[0.98];
+  }
+
+  /* iOS毛玻璃效果 */
+  .ios-blur {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+
+  .dark .ios-blur {
+    background: rgba(28, 28, 30, 0.8);
+  }
+
+  /* iOS按钮 */
+  .ios-button {
+    @apply h-12 sm:h-11 px-6;
+    @apply rounded-xl;
+    @apply text-base sm:text-[17px] font-semibold;
+    @apply transition-all duration-200;
+    @apply active:scale-95;
+  }
+
+  .ios-button-primary {
+    @apply ios-button;
+    @apply bg-blue-500 text-white;
+    @apply shadow-sm;
+  }
+
+  .ios-button-secondary {
+    @apply ios-button;
+    @apply bg-gray-100 dark:bg-gray-800;
+    @apply text-gray-700 dark:text-gray-300;
+  }
+
+  /* iOS输入框 */
+  .ios-input {
+    @apply h-12 sm:h-11;
+    @apply border border-gray-200 dark:border-gray-700;
+    @apply rounded-xl;
+    @apply text-base sm:text-[17px];
+    @apply px-4;
+    @apply bg-white dark:bg-gray-900;
+    @apply text-gray-900 dark:text-white;
+    @apply placeholder:text-gray-400;
+    @apply transition-all duration-200;
+    @apply focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10;
+  }
+
+  .ios-input-label {
+    @apply text-sm font-medium;
+    @apply text-gray-600 dark:text-gray-400;
+    @apply mb-2;
+    @apply block;
+  }
+
+  /* iOS系统颜色 */
+  .ios-blue { 
+    color: #007AFF; 
+  }
+  .ios-green { 
+    color: #34C759; 
+  }
+  .ios-red { 
+    color: #FF3B30; 
+  }
+  .ios-orange { 
+    color: #FF9500; 
+  }
+  .ios-gray { 
+    color: #8E8E93; 
+  }
+
+  .ios-bg-blue { 
+    background: #007AFF; 
+  }
+  .ios-bg-green { 
+    background: #34C759; 
+  }
+  .ios-bg-red { 
+    background: #FF3B30; 
+  }
+  .ios-bg-orange { 
+    background: #FF9500; 
+  }
+  .ios-bg-gray { 
+    background: #F2F2F7; 
+  }
+
+  /* iOS分组间距 */
+  .ios-spacing-section {
+    @apply space-y-6 sm:space-y-5;
+  }
+
+  .ios-spacing-group {
+    @apply space-y-4 sm:space-y-3;
+  }
+
+  /* iOS列表项 */
+  .ios-list-item {
+    @apply flex items-center justify-between;
+    @apply py-3 px-4;
+    @apply rounded-xl;
+    @apply bg-gray-50 dark:bg-gray-800/50;
+    @apply transition-colors;
+    @apply active:bg-gray-100 dark:active:bg-gray-700;
+  }
+}
+
 /* 打印样式 */
 @media print {
   .no-print {

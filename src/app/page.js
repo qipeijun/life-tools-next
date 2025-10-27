@@ -1,23 +1,21 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ToolCard } from '../components/layout/ToolCard'
 import { ThemeToggle } from '../components/ui/ThemeToggle'
+import Link from 'next/link'
 import {
-  TrendingUp,
   Calculator,
-  Grid3X3,
   Coffee,
+  TrendingUp,
+  Grid3X3,
   BarChart3,
-  Sparkles,
-  Zap
+  ChevronRight,
 } from 'lucide-react'
 
 export default function HomePage() {
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
-    // 检测是否为移动设备
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 640)
     }
@@ -28,219 +26,201 @@ export default function HomePage() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  const tools = {
-    investment: [
-      {
-        title: 'KDJ + RSI',
-        subtitle: '技术指标智能分析',
-        description: '基于KDJ和RSI指标的专业分析工具，助您把握市场脉搏',
-        href: '/kdj-rsi',
-        gradient: 'from-primary-500 to-primary-600',
-        icon: <TrendingUp className="w-full h-full" />,
-        category: '交易工具'
-      },
-      {
-        title: 'KDJ + RSI Pro',
-        subtitle: '增强版分析工具',
-        description: '支持KDJ完整指标、图表显示和专业级分析算法',
-        href: '/kdj-rsi-pro',
-        gradient: 'from-accent-500 to-accent-600',
-        icon: <BarChart3 className="w-full h-full" />,
-        version: 'Pro',
-        category: '交易工具'
-      },
-      {
-        title: '做T计算器',
-        subtitle: '精准计算交易成本',
-        description: '详细计算买卖成本、手续费和盈亏平衡点',
-        href: '/t-day-calculator',
-        gradient: 'from-success-500 to-success-600',
-        icon: <Calculator className="w-full h-full" />,
-        category: '交易工具'
-      },
-      {
-        title: 'ETH 网格策略',
-        subtitle: '动态区间智能优化',
-        description: '基于RSI的智能网格区间计算和收益分析',
-        href: '/grid-strategy',
-        gradient: 'from-warning-500 to-warning-600',
-        icon: <Grid3X3 className="w-full h-full" />,
-        category: '交易工具'
-      }
-    ],
-    lifestyle: [
-      {
-        title: '豆浆助手',
-        subtitle: '精准时间计算',
-        description: '智能预约制作，确保在最佳时间享用热腾腾的豆浆',
-        href: '/soy-milk',
-        gradient: 'from-amber-500 to-amber-600',
-        icon: <Coffee className="w-full h-full" />,
-        category: '生活助手'
-      }
-    ]
- }
+  // 常用工具（大卡片展示）
+  const favoriteTools = [
+    {
+      title: '做T计算器',
+      description: '精准计算收益',
+      href: '/t-day-calculator',
+      icon: Calculator,
+      gradient: 'from-green-400 to-green-600',
+    },
+    {
+      title: '豆浆助手',
+      description: '智能预约时间',
+      href: '/soy-milk',
+      icon: Coffee,
+      gradient: 'from-amber-400 to-amber-600',
+    },
+  ]
+
+  // 投资分析工具（列表展示）
+  const investmentTools = [
+    {
+      title: 'KDJ + RSI 分析',
+      description: '技术指标智能分析',
+      href: '/kdj-rsi',
+      icon: TrendingUp,
+      color: 'text-blue-500',
+      bg: 'bg-blue-50 dark:bg-blue-900/10',
+    },
+    {
+      title: 'KDJ + RSI Pro',
+      description: '增强版分析工具',
+      href: '/kdj-rsi-pro',
+      icon: BarChart3,
+      color: 'text-purple-500',
+      bg: 'bg-purple-50 dark:bg-purple-900/10',
+      badge: 'Pro',
+    },
+    {
+      title: 'ETH 网格策略',
+      description: '智能区间计算',
+      href: '/grid-strategy',
+      icon: Grid3X3,
+      color: 'text-indigo-500',
+      bg: 'bg-indigo-50 dark:bg-indigo-900/10',
+    },
+  ]
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* 背景装饰 */}
-      <div className="fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] animate-pulse" />
-        <div className="absolute top-1/2 right-1/4 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }} />
-        <div className="absolute bottom-0 left-1/3 w-[500px] h-[500px] bg-success/5 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '4s' }} />
-      </div>
-
-      <div className="container">
+    <div className="min-h-screen bg-gray-50 dark:bg-black">
+      <div className="mx-auto max-w-2xl px-4 sm:px-6 py-4 sm:py-6">
         {/* 头部 */}
-        <header className="py-8 sm:py-12">
-          <nav className="flex justify-between items-center mb-8 max-w-4xl mx-auto">
-            <div className="w-10" />
-            <div className="flex items-center gap-3">
-              <Sparkles className="w-8 h-8 text-primary animate-pulse" />
-              <h1 className="h1 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent font-bold text-balance">
-                生活工具集
-              </h1>
-              <Sparkles className="w-8 h-8 text-accent animate-pulse animate-delay-1000" />
-            </div>
-            <ThemeToggle />
-          </nav>
-
-          <div className="text-center space-y-4 max-w-3xl mx-auto">
-            <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed px-4 text-pretty">
-              专业的投资分析工具和生活助手集合
-              <br />
-              <span className="text-primary font-semibold">让投资更智能，让生活更便捷</span>
+        <header className="flex items-center justify-between mb-8 sm:mb-10">
+          <div>
+            <h1 className="ios-large-title">生活工具</h1>
+            <p className="text-base text-gray-500 dark:text-gray-400 mt-1">
+              简洁、好用、高效
             </p>
-
-            {/* 统计信息 */}
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 mt-8 px-4">
-              <div className="flex items-center gap-2">
-                <div className="text-3xl font-bold text-primary">5+</div>
-                <div className="text-sm text-muted-foreground">实用工具</div>
-              </div>
-              
-              <div className="hidden sm:block w-px h-6 bg-border/50" />
-              <div className="sm:hidden h-px w-16 bg-border/50" />
-              
-              <div className="flex items-center gap-2">
-                <div className="text-3xl font-bold text-success">100%</div>
-                <div className="text-sm text-muted-foreground">免费使用</div>
-              </div>
-              
-              <div className="hidden sm:block w-px h-6 bg-border/50" />
-              <div className="sm:hidden h-px w-16 bg-border/50" />
-              
-              <div className="flex items-center gap-2">
-                <div className="text-3xl font-bold text-accent">24/7</div>
-                <div className="text-sm text-muted-foreground">随时可用</div>
-              </div>
-            </div>
           </div>
+          <ThemeToggle />
         </header>
 
         {/* 主要内容 */}
-        <main className="space-y-16 sm:space-y-20">
-          {/* 投资理财工具 */}
+        <div className="ios-spacing-section">
+          {/* 常用工具 */}
           <section>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 px-4">
-              <div>
-                <h2 className="h2 mb-2">投资理财</h2>
-                <p className="text-base text-muted-foreground">专业的金融分析工具，助您做出明智投资决策</p>
-              </div>
-              <div className="hidden sm:flex items-center gap-2 text-primary">
-                <Zap className="w-5 h-5" />
-                <span className="text-sm font-medium">智能分析</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-              {tools.investment.map((tool, index) => (
-                <div key={tool.href}>
-                  <ToolCard
-                    {...tool}
-                    size={isMobile ? 'sm' : 'md'}
-                    delay={0}
-                  />
-                </div>
+            <h2 className="ios-section-header">⚡️ 常用</h2>
+            <div className="grid grid-cols-2 gap-4">
+              {favoriteTools.map((tool) => (
+                <Link
+                  key={tool.href}
+                  href={tool.href}
+                  className="group block"
+                >
+                  <div
+                    className={`
+                      relative overflow-hidden
+                      h-36 sm:h-40
+                      rounded-2xl
+                      bg-gradient-to-br ${tool.gradient}
+                      shadow-sm
+                      transition-all duration-200
+                      active:scale-95
+                    `}
+                  >
+                    {/* 渐变叠加 */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
+                    
+                    {/* 内容 */}
+                    <div className="relative h-full p-5 flex flex-col justify-between text-white">
+                      {/* 图标 */}
+                      <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                        <tool.icon className="w-6 h-6 text-white" />
+                      </div>
+                      
+                      {/* 文字 */}
+                      <div>
+                        <h3 className="text-lg font-bold mb-0.5 drop-shadow-lg">
+                          {tool.title}
+                        </h3>
+                        <p className="text-sm text-white/90 drop-shadow-md">
+                          {tool.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
               ))}
             </div>
           </section>
 
-          {/* 生活助手 */}
+          {/* 投资分析 */}
           <section>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 px-4">
-              <div>
-                <h2 className="h2 mb-2">生活助手</h2>
-                <p className="text-base text-muted-foreground">贴心实用的生活工具，让日常更加便利</p>
-              </div>
-              <div className="hidden sm:flex items-center gap-2 text-success">
-                <Coffee className="w-5 h-5" />
-                <span className="text-sm font-medium">便捷生活</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-              {tools.lifestyle.map((tool, index) => (
-                <div key={tool.href}>
-                  <ToolCard
-                    {...tool}
-                    size={isMobile ? 'sm' : 'md'}
-                    delay={0}
-                  />
-                </div>
+            <h2 className="ios-section-header">📈 投资分析</h2>
+            <div className="space-y-3">
+              {investmentTools.map((tool) => (
+                <Link
+                  key={tool.href}
+                  href={tool.href}
+                  className="block group"
+                >
+                  <div className="ios-card flex items-center justify-between hover:shadow-md transition-shadow">
+                    {/* 左侧内容 */}
+                    <div className="flex items-center gap-4 flex-1">
+                      {/* 图标 */}
+                      <div className={`
+                        w-12 h-12 rounded-2xl flex items-center justify-center
+                        ${tool.bg}
+                      `}>
+                        <tool.icon className={`w-6 h-6 ${tool.color}`} />
+                      </div>
+                      
+                      {/* 文字 */}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                            {tool.title}
+                          </h3>
+                          {tool.badge && (
+                            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
+                              {tool.badge}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                          {tool.description}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* 右侧箭头 */}
+                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
+                  </div>
+                </Link>
               ))}
             </div>
           </section>
 
-          {/* 特色功能 */}
-          <section className="glass rounded-3xl p-6 sm:p-8 max-w-5xl mx-auto">
-            <div className="text-center mb-8 sm:mb-12">
-              <h3 className="h3 mb-4">为什么选择我们？</h3>
-              <p className="text-base text-muted-foreground max-w-2xl mx-auto text-pretty">
-                专业的算法设计、简洁的界面体验、强大的功能整合
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
-              <div className="text-center space-y-4 group">
-                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto transition-all duration-300 group-hover:scale-105 group-hover:bg-primary/20">
-                  <TrendingUp className="w-6 h-6 text-primary" />
+          {/* 特性介绍 */}
+          <section>
+            <h2 className="ios-section-header">✨ 特性</h2>
+            <div className="ios-card">
+              <div className="grid grid-cols-3 gap-6 text-center">
+                <div>
+                  <div className="text-2xl font-bold text-blue-500 mb-1">
+                    5+
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    实用工具
+                  </div>
                 </div>
-                <h4 className="font-semibold">专业精准</h4>
-                <p className="text-sm text-muted-foreground text-pretty">
-                  基于成熟算法，提供准确可靠的分析结果
-                </p>
-              </div>
-
-              <div className="text-center space-y-4 group">
-                <div className="w-16 h-16 bg-success/10 rounded-2xl flex items-center justify-center mx-auto transition-all duration-300 group-hover:scale-105 group-hover:bg-success/20">
-                  <Sparkles className="w-6 h-6 text-success" />
+                <div>
+                  <div className="text-2xl font-bold text-green-500 mb-1">
+                    100%
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    免费使用
+                  </div>
                 </div>
-                <h4 className="font-semibold">简洁易用</h4>
-                <p className="text-sm text-muted-foreground text-pretty">
-                  直观的界面设计，无需学习即可快速上手
-                </p>
-              </div>
-
-              <div className="text-center space-y-4 group">
-                <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto transition-all duration-300 group-hover:scale-105 group-hover:bg-accent/20">
-                  <Zap className="w-6 h-6 text-accent" />
+                <div>
+                  <div className="text-2xl font-bold text-purple-500 mb-1">
+                    24/7
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    随时可用
+                  </div>
                 </div>
-                <h4 className="font-semibold">实时计算</h4>
-                <p className="text-sm text-muted-foreground text-pretty">
-                  即时响应用户输入，实时查看计算结果
-                </p>
               </div>
             </div>
           </section>
-        </main>
 
-        {/* 页脚 */}
-        <footer className="mt-16 sm:mt-20 py-6 sm:py-8 border-t border-border/30 text-center text-muted-foreground">
-          <p className="text-sm">
-            用心打造，为您的投资和生活保驾护航
-          </p>
-        </footer>
+          {/* 页脚 */}
+          <footer className="text-center text-sm text-gray-500 dark:text-gray-400 py-6">
+            <p>用心打造，为您的投资和生活保驾护航</p>
+          </footer>
+        </div>
       </div>
     </div>
   )
