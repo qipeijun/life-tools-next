@@ -129,6 +129,72 @@ export function calculateTDayProfit(
   }
 }
 
+/**
+ * 反向计算：根据目标收益率计算所需的卖出价格
+ * @param {number} buyPrice - 买入价格
+ * @param {number} quantity - 股票数量
+ * @param {number} targetProfitRate - 目标收益率（百分比，如2表示2%）
+ * @param {object} feeConfig - 手续费配置 { type: 'ratio'|'fixed', value: number }
+ * @returns {object} 包含所需卖出价和完整计算结果
+ */
+export function calculateRequiredSellPrice(
+  buyPrice,
+  quantity,
+  targetProfitRate,
+  feeConfig = { type: 'ratio', value: 0.0003 }
+) {
+  const buy = parseFloat(buyPrice)
+  const qty = parseInt(quantity)
+  const targetRate = parseFloat(targetProfitRate) / 100 // 转换为小数
+  
+  // 计算买入手续费
+  let buyFee
+  if (feeConfig.type === 'fixed') {
+    buyFee = feeConfig.value
+  } else {
+    buyFee = buy * qty * feeConfig.value
+  }
+  
+  // 买入成本
+  const buyCost = buy * qty + buyFee
+  
+  // 目标收益
+  const targetProfit = buyCost * targetRate
+  
+  // 目标卖出收入
+  const targetSellIncome = buyCost + targetProfit
+  
+  // 反向求解卖出价格
+  // sellIncome = sellPrice * qty - sellFee - stampDuty
+  // 其中 sellFee 和 stampDuty 都依赖于 sellPrice
+  // 需要迭代求解或者解方程
+  
+  let sellPrice
+  
+  if (feeConfig.type === 'fixed') {
+    // 固定手续费模式：相对简单
+    // targetSellIncome = sellPrice * qty - feeConfig.value - sellPrice * qty * 0.001
+    // targetSellIncome = sellPrice * qty * (1 - 0.001) - feeConfig.value
+    // sellPrice = (targetSellIncome + feeConfig.value) / (qty * 0.999)
+    sellPrice = (targetSellIncome + feeConfig.value) / (qty * 0.999)
+  } else {
+    // 比例手续费模式
+    // targetSellIncome = sellPrice * qty - sellPrice * qty * feeConfig.value - sellPrice * qty * 0.001
+    // targetSellIncome = sellPrice * qty * (1 - feeConfig.value - 0.001)
+    // sellPrice = targetSellIncome / (qty * (1 - feeConfig.value - 0.001))
+    sellPrice = targetSellIncome / (qty * (1 - feeConfig.value - 0.001))
+  }
+  
+  // 使用计算出的卖出价格进行完整计算，验证结果
+  const fullResult = calculateTDayProfit(buy, sellPrice, qty, feeConfig)
+  
+  return {
+    requiredSellPrice: sellPrice.toFixed(3),
+    targetProfitRate: targetProfitRate.toFixed(2),
+    ...fullResult
+  }
+}
+
 // 豆浆预约计算
 export function calculateSoyMilkTime(targetDrinkTime, makingTime = 25) {
   const target = new Date(targetDrinkTime)
