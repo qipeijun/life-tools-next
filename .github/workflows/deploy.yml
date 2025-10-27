@@ -1,0 +1,75 @@
+name: Build and Deploy
+
+# 手动触发或推送到master分支时执行
+on:
+  workflow_dispatch:  # 允许手动触发
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. 检出代码
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. 设置Node.js环境
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      # 3. 安装依赖
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # 4. 构建项目（Next.js会自动导出静态文件到out目录）
+      - name: Build
+        run: yarn build
+        env:
+          NODE_ENV: production
+
+      # 5. 添加.nojekyll文件（防止GitHub Pages忽略下划线开头的文件）
+      - name: Add .nojekyll
+        run: touch ./out/.nojekyll
+
+      # 6. 部署到GitHub Pages
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
+          # 保持git历史
+          # force_orphan: true
+
+      # 7. 上传构建产物
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: |
+            .next/
+            out/
+          retention-days: 7
+
+  # 可选：部署到其他平台
+  deploy-to-vercel:
+    runs-on: ubuntu-latest
+    needs: build-and-deploy
+    if: github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        run: |
+          echo "部署到Vercel（需要配置VERCEL_TOKEN）"
+          # npm i -g vercel
+          # vercel --token=${{ secrets.VERCEL_TOKEN }} --prod
+
